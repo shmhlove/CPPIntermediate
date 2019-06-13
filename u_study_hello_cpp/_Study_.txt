@@ -1,0 +1,69 @@
+--------------------------------------------------
+컴파일러
+> g++ hello.cpp -std=c++1z
+    -std=c++1z : c++ 17을 사용하겠다는 옵션
+    
+> cl hello.cpp /std:c++latest /nologo /EHsc /Za /MD
+    /std:c++latest : c++ 17을 사용하겠다는 옵션
+    /nologo : 로고 제거
+    /EHsc : 예외관련 로그 제거
+    /Za : 확장문법 사용 제거
+    /MD : C/C++ 표준라이브러리를 DLL버전을 쓰겠다는 옵션(Windows만 해당)
+    
+# minGW설치
+    https://nuwen.net > MinGW_Distro > mingw-15.3-without-git.exe > open_distro_window.bat
+    -> 정상작동안함,, 그냥 VisualStudio 개발자 명령프롬프트 사용하자.
+--------------------------------------------------
+build 배치파일
+    g++ %1 -std=c++1z
+    cl %1 /std:c++latest /nologo /EHsc /Za /MD
+--------------------------------------------------
+cl test1_helloworld.cpp /FAs
+    /FAs : 어셈블리코드로 빌드
+--------------------------------------------------
+cl test2_EP.cpp /EP
+    /EP : 전처리된 결과만
+    -결과-
+    int main ()
+    {
+        int arr[MAX] = { 0 };
+        int n = SQUARE(3);
+    }
+    int main ()
+    {
+        int arr[10] = { 0 };
+        int n = ((3)*(3));
+    }
+--------------------------------------------------
+언어확장
+    struct Point
+    {
+        int x, y
+    };
+    int main()
+    {
+        Point& p = Point(); // error, 임시객체는 참조를 가리킬 수 없다.
+                            // VS로 빌드하면 succes, C++ 표준 + 확장문법을 지원하기 때문
+    }
+    
+# VisualStudio에서 제거하는 방법
+    프로젝트 속성 > C/C++ > 언어 > 언어 확장 사용 안 함 (예/Za)
+--------------------------------------------------
+예제코드
+https://github.com/codenuri/
+--------------------------------------------------
+www.isocpp.org
+c++98(1998~2003) > c++03(2003~2011) > c++11(2011) > c++14(2014) > c++17(2017)
+    3년 주기로 c++표준버전을 올리겠다.
+    
+c++20 예정스팩
+    Reflection
+    Lib Fundamentals 3
+    Coroutines
+    Modules
+    Ranges
+    ...
+--------------------------------------------------
+// g++ test3_hello.cpp -std=c++1z
+// cl test3_hello.cpp /std:c++latest
+--------------------------------------------------

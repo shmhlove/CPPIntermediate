@@ -1,6 +1,6 @@
 /* 빌드 하는 법
 	g++ test4.cpp
-	cl test8.cpp /nologo /EHsc
+	cl test10.cpp /nologo /EHsc
 	
 	주의! VC++ 확장 문법 사용을 사용해야함.
 	/Za 옵션을 사용하면 컴파일 안됨
@@ -41,4 +41,13 @@ int main()
 	
 	obj.fa(); // fa(&obj);
 	obj.fb(); // fb(&obj + sizeof(A));
+	
+	void (C::*f)();
+	cout << sizeof(f) << endl; // 8byte (함수주소 + this object)
+	
+	f = &C::fa;
+	(obj.*f)();	// fa(&obj);
+	
+	f = &C::fb;
+	(obj.*f)();	// fb(&obj + sizeof(A));
 }

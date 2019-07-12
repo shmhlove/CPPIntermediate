@@ -1,0 +1,71 @@
+--------------------------------------------------
+<test1>
+    함수오버로딩 시 컴파일러는 실제로 함수이름을 달리 만든다.
+    컴파일러마다 NameMangling하는 규칙이 다르다.
+    어셈코드로 보면 아래와 같다.
+    PUBLIC	?square@@YAHH@Z					; square
+    PUBLIC	?square@@YANN@Z					; square
+--------------------------------------------------
+<test2.cpp, square.c, square.h>
+    NameMangling으로 인해 발생하는 C언어와 C++의 호환성 문제
+    
+    g++ 빌드성공
+    cl 빌드실패
+    gcc 빌드실패
+    
+    cl 컴파일러나 gcc 컴파일러는 확장자를 보고 c로 컴파일 할지 c++로 컴파일 할지 결정한다.    
+    test2.obj : error LNK2019: "int __cdecl square(int)" (?square@@YAHH@Z) 외부 기호(참조 위치: _main 함수)에서 확인하지 못했습니다.
+    
+    해결방법은
+    .c파일 상단에 
+    extern "C" 를 넣어주면
+    c++컴파일러에게 C처럼 해석해 달라는 명령이다.
+    
+    gcc는 빌드실패(extern을 이해하지 못한다 )
+--------------------------------------------------
+<test3.c, square.c, square.h>
+
+    g++ 빌드실패
+    cl 빌드실패
+    gcc 빌드실패
+    
+    c컴파일러는 extern "C"을 이해하지 못한다.
+    
+    그래서
+    
+    extern을 사용할때에는 
+    #ifdef __cplusplus 매크로를 사용해야한다.
+    
+    #ifdef __cplusplus
+    extern "C" {
+    #endif
+    
+    ...
+    
+    #ifdef __cplusplus
+    }
+    #endif
+--------------------------------------------------
+<test4, test5>
+함수 이름과 함수주소
+    // error
+    //printf("%p\n", &square);
+    // ok
+    printf("%p\n", static_cast<int(*)(int)>(&square));
+    printf("%p\n", static_cast<double(*)(double)>(&square));
+    
+    // error
+    //auto p = &square;
+    // ok
+    int(*f)(int) = &square;
+--------------------------------------------------
+<test6>
+    함수오버로딩 시 함수찾는 순서
+    
+    // exactly matching
+    // template
+    // promotion
+    // standard conversion
+    // user define conversion
+    // variadic argument
+--------------------------------------------------

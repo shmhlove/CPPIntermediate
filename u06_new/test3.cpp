@@ -20,15 +20,26 @@ public:
 
 void* operator new(size_t sz)
 {
-    printf("my new\n");
-	//cout << "my new" << endl;
+    printf("my new1\n");
 	return malloc(sz);
 }
+
+void* operator new(size_t sz, int n, char* s)
+{
+    printf("my new2\n");
+	return malloc(sz);
+}
+
+// 아래 재정의는 이미 C++ 표준에 구현되어 있음
+//void* operator new(size_t sz, void* p)
+//{
+//    printf("my new3\n");
+//	return p;
+//}
 
 void operator delete(void* p) noexcept
 {
     printf("my delete\n");
-	//cout << "my delete" << endl;
 	free(p);
 }
 
@@ -49,4 +60,17 @@ int main()
     // operator delete : only memory
 	operator delete(p3);
     printf("end operator new-delete\n\n");
+    
+	// new : memory and constructor
+	Point* p4 = new(1, "A") Point;
+	// delete : memory and destructor
+    p4->~Point();
+	delete p4;
+	printf("end call destructor\n\n");
+    
+	// new : not memory, only call constructor
+	Point p5;
+    Point* p5_new = new(&p5) Point;
+    printf("%p, %p\n", &p5, p5_new);
+	printf("end call constructor\n\n");
 }

@@ -1,17 +1,100 @@
 --------------------------------------------------
-// malloc :  메모리만 할당
-Point* p1 = (Point*)malloc(sizeof(Point));
+<test1>
+    // malloc :  메모리만 할당
+    Point* p1 = (Point*)malloc(sizeof(Point));
 
-// new : 메모리할당 + 생성자 호출
-Point* p2 = new Point;
-// delete : 메모리해제 + 소멸자 호출
-delete p2;
+    // new : 메모리할당 + 생성자 호출
+    Point* p2 = new Point;
+    // delete : 메모리해제 + 소멸자 호출
+    delete p2;
 
-// operator new : 메모리만 할당
-// operator delete : 메모리만 해제
-Point* p3 = static_cast<Point*>(operator new(sizeof(Point)));
-operator delete(p3);
+    // operator new : 메모리만 할당
+    // operator delete : 메모리만 해제
+    Point* p3 = static_cast<Point*>(operator new(sizeof(Point)));
+    operator delete(p3);
 --------------------------------------------------
-operator new 재정의
+<test2>
+    operator new와 operator delete 재정의
+    void* operator new(size_t sz)
+    {
+        cout << "my new" << endl;
+        return malloc(sz);
+    }
 
+    void operator delete(void* p) noexcept
+    {
+        cout << "my delete" << endl;
+        free(p);
+    }
+--------------------------------------------------
+<test3>
+operator new 오버로딩
+    void* operator new(size_t sz)
+    {
+        printf("my new1\n");
+        return malloc(sz);
+    }
+
+    void* operator new(size_t sz, int n, char* s)
+    {
+        printf("my new2\n");
+        return malloc(sz);
+    }
+
+operator delete 명시적호출 오버로딩
+    p4->~Point();
+
+operator new 명시적호출 오버로딩(Placement new)
+    //void* operator new(size_t sz, void* p)
+    //{
+    //    printf("my new3\n");
+    //	return p;
+    //}
+        Point p5;
+        Point* p5_new = new(&p5) Point;
+--------------------------------------------------
+<test4>
+Placement new를 어디에 사용하나?
+(대표적으로 stl vector)
+
+첫번째 이유
+    디폴트 생성자가 없는 클래스객체를 생성할때
+    Point* p1 = new Point[10] 이렇게 안된다.
+    그래서
+    
+    1. 메모리만 먼저 힙에 할당
+    Point* p2 = static_cast<Point*>(operator new(sizeof(Point) * 10));
+    
+    2. 생성자 호출(할당된 메모리의 객체를 생성)
+    for(int iLoop = 0; iLoop<10; ++iLoop)
+    {
+        new (&p2[iLoop]) Point(0,0);
+    }
+    
+    3. 자원관리해줘야지(소멸자 호출하고, 메모리해제)
+    for(int iLoop = 0; iLoop<10; ++iLoop)
+    {
+        p2[iLoop].~Point();
+    }
+    operator delete(p2);
+    
+두번째 이유
+    vector<int> v(10, 0);
+    v.resize(7);
+    // 실제 size가 7로 줄어드는게 아니다.
+    // 메모리 사용량은 10이다. 
+    // v.size(); // 7
+    // v.capacity(); // 10
+    
+    메모리를 실제 해제하는 것이 아니기 때문에
+    소멸자를 명시적으로 호출해야할 필요가 있다.
+    
+세번째 이유
+    프로세스간 통신시 공유메모리 사용할때(IPC)
+    // 메모리 할당
+    HANDLE hMap = CreateFileMappingA(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0, sizeof(Point), 0);
+    // 메모리 가져오기
+    Point* p = (Point*)MapViewOfFile(hMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+    // 생성자를 호출하여 객체화
+    new(p) Point(0, 0);
 --------------------------------------------------

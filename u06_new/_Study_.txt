@@ -1,0 +1,17 @@
+--------------------------------------------------
+// malloc :  메모리만 할당
+Point* p1 = (Point*)malloc(sizeof(Point));
+
+// new : 메모리할당 + 생성자 호출
+Point* p2 = new Point;
+// delete : 메모리해제 + 소멸자 호출
+delete p2;
+
+// operator new : 메모리만 할당
+// operator delete : 메모리만 해제
+Point* p3 = static_cast<Point*>(operator new(sizeof(Point)));
+operator delete(p3);
+--------------------------------------------------
+operator new 재정의
+
+--------------------------------------------------
